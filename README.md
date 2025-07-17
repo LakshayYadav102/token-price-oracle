@@ -39,26 +39,6 @@ A decentralized utility that allows users to query **historical token prices** (
 
 ---
 
-## 📂 Folder Structure
-
-token-oracle/
-│
-├── client/ # Next.js frontend (App Router)
-│ ├── src/
-│ ├── public/
-│ ├── pages/ or app/
-│ └── ...
-│
-├── routes/ # Express route handlers
-├── controllers/ # Controller logic for each route
-├── utils/ # Helper functions (API calls, formatting, etc.)
-├── .env # Environment variables (ignored in Git)
-├── .gitignore
-├── server.js # Express entry point
-└── package.json
-
----
-
 ## 🌐 Supported Networks
 
 - Ethereum Mainnet
