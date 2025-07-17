@@ -1,11 +1,11 @@
+// server/index.js
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-//const priceRoutes = require('./routes/priceRoutes');
-//const scheduleRoutes = require('./routes/scheduleRoutes');
-const { redis } = require('./redisClient');
-const apiRoutes = require('./routes/apiRoutes');
+const redis = require('./redisClient'); // ✅ Correct import — no destructuring
+
+const apiRoutes = require('./routes/apiRoutes'); // ✅ Combined route
 
 dotenv.config();
 
@@ -14,22 +14,20 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ API Routes
-//app.use('/api', priceRoutes);
-//app.use('/api', scheduleRoutes);
-app.use('/api', apiRoutes); // ✅ Only this
+app.use('/api', apiRoutes);
 
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// ✅ Health Check
+// ✅ Health Check Route
 app.get('/', async (req, res) => {
   try {
-    await redis.set('health-check', 'ok', 'EX', 30);
+    await redis.set('health-check', 'ok');
     const value = await redis.get('health-check');
     res.send(`🚀 Token Oracle Backend Running — Redis says: ${value}`);
   } catch (err) {
