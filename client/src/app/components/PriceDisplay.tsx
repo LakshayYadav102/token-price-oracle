@@ -1,4 +1,10 @@
-export default function PriceDisplay({ data }: { data: any }) {
+interface PriceData {
+  price: number;
+  source: string;
+  error?: string;
+}
+
+export default function PriceDisplay({ data }: { data: PriceData | null }) {
   if (!data) return null;
   if (data.error) return <div className="text-red-600">❌ {data.error}</div>;
 
