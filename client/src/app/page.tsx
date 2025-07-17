@@ -16,6 +16,8 @@ const TOKEN_MAP = {
   },
 };
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000/api';
+
 export default function Home() {
   const [token, setToken] = useState<'USDC' | 'DAI' | 'UNI'>('USDC');
   const [network, setNetwork] = useState<'ethereum' | 'polygon'>('ethereum');
@@ -32,7 +34,7 @@ export default function Home() {
 
     const tokenAddress = TOKEN_MAP[token][network];
 
-    const res = await fetch('http://localhost:5000/api/price', {
+    const res = await fetch(`${API_BASE}/price`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -51,7 +53,7 @@ export default function Home() {
     setDate('');
     const tokenAddress = TOKEN_MAP[token][network];
 
-    const res = await fetch('http://localhost:5000/api/schedule', {
+    const res = await fetch(`${API_BASE}/schedule`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
