@@ -1,4 +1,4 @@
-// server/redisRestClient.js
+// server/redisClient.js
 require('dotenv').config();
 const fetch = require('node-fetch');
 
@@ -8,7 +8,9 @@ const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 const redis = {
   async set(key, value) {
     try {
-      const res = await fetch(`${baseURL}/set/${key}/${value}`, {
+      const safeKey = encodeURIComponent(key);
+      const safeValue = encodeURIComponent(value);
+      const res = await fetch(`${baseURL}/set/${safeKey}/${safeValue}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,7 +25,8 @@ const redis = {
 
   async get(key) {
     try {
-      const res = await fetch(`${baseURL}/get/${key}`, {
+      const safeKey = encodeURIComponent(key);
+      const res = await fetch(`${baseURL}/get/${safeKey}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
