@@ -23,26 +23,21 @@ function delay(ms) {
 function formatDate(d) {
   return d.toISOString().split('T')[0];
 }
-
 // 🧠 BullMQ Worker
 const worker = new Worker('price-history', async job => {
   const { token, network } = job.data;
 
-  // 🔍 Log job input
   console.log(`🔍 Running job for token: ${token}, network: ${network}`);
 
-  // ✅ Initialize Alchemy SDK with dynamic network
   const alchemy = new Alchemy({
     apiKey: process.env.ALCHEMY_API_KEY,
     network: network === 'polygon' ? Network.MATIC_MAINNET : Network.ETH_MAINNET,
   });
 
-  // ✅ Dynamic Alchemy RPC using ethers
   const rpcUrl = getAlchemyRpc(network);
   const provider = new JsonRpcProvider(rpcUrl);
 
   try {
-    // 🕵️ Get the token's first transfer (to estimate creation date)
     const firstTx = await alchemy.core.getAssetTransfers({
       fromBlock: '0x0',
       toBlock: 'latest',
@@ -53,7 +48,6 @@ const worker = new Worker('price-history', async job => {
       withMetadata: true,
     });
 
-    // 🪵 Debug log the raw transfers
     console.log('📦 Transfers from Alchemy:', JSON.stringify(firstTx.transfers, null, 2));
 
     if (!firstTx.transfers.length) throw new Error('Token creation date not found');
@@ -61,7 +55,6 @@ const worker = new Worker('price-history', async job => {
     let createdAt = new Date(firstTx.transfers[0].metadata.blockTimestamp);
     const today = new Date();
 
-    // ⏳ Limit to 1 year for CoinGecko
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
     if (createdAt < oneYearAgo) createdAt = oneYearAgo;
@@ -78,7 +71,10 @@ const worker = new Worker('price-history', async job => {
 
         if (price) {
           await TokenPrice.create({ token, network, date: dateStr, timestamp: unix, price });
-          await redis.set(cacheKey, price.toFixed(3));
+          console.log("🧪 Worker caching price:", cacheKey, price);
+          if (price !== undefined) {
+            await redis.set(cacheKey, price.toFixed(3));
+          }
           console.log(`✅ [${token}] ${dateStr}: $${price}`);
         } else {
           console.warn(`⚠️ [${token}] ${dateStr}: No price returned`);
@@ -96,7 +92,6 @@ const worker = new Worker('price-history', async job => {
   }
 }, { connection, concurrency: 10 });
 
-// ✅ Events
 worker.on('completed', job => {
   console.log(`🎉 Job ${job.id} completed`);
 });
