@@ -1,9 +1,8 @@
 const TokenPrice = require('../models/TokenPrice');
-const redis = require('../redisClient');
-const { JsonRpcProvider } = require('ethers');  // ✅ v6+ import
+const redis = require('../redisClient'); // ✅ updated
+const { JsonRpcProvider } = require('ethers');
 const getAlchemyRpc = require('../utils/getAlchemyRpc');
 
-// 🔁 Interpolation function
 const interpolate = (ts, ts0, p0, ts1, p1) => {
   const ratio = (ts - ts0) / (ts1 - ts0);
   return p0 + (p1 - p0) * ratio;
@@ -18,7 +17,6 @@ const getPrice = async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // ✅ Use JsonRpcProvider (v6+)
     const rpcUrl = getAlchemyRpc(network);
     const provider = new JsonRpcProvider(rpcUrl);
 
@@ -28,7 +26,7 @@ const getPrice = async (req, res) => {
 
     const exact = await TokenPrice.findOne({ token, network, timestamp });
     if (exact) {
-      await redis.set(cacheKey, exact.price.toFixed(4), { ex: 300 });
+      await redis.set(cacheKey, exact.price.toFixed(4));
       return res.json({ price: exact.price, source: "db" });
     }
 
@@ -47,8 +45,8 @@ const getPrice = async (req, res) => {
     const p1 = after[0].price;
 
     const interpolated = interpolate(timestamp, ts0, p0, ts1, p1);
+    await redis.set(cacheKey, interpolated.toFixed(4));
 
-    await redis.set(cacheKey, interpolated.toFixed(4), { ex: 300 });
     return res.json({ price: parseFloat(interpolated.toFixed(4)), source: "interpolated" });
 
   } catch (err) {
