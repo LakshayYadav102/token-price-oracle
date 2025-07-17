@@ -69,16 +69,14 @@ const worker = new Worker('price-history', async job => {
       try {
         const price = await fetchHistoricalPrice(token, current, network);
 
-        if (price) {
-          await TokenPrice.create({ token, network, date: dateStr, timestamp: unix, price });
-          console.log("🧪 Worker caching price:", cacheKey, price);
-          if (price !== undefined) {
-            await redis.set(cacheKey, price.toFixed(3));
-          }
-          console.log(`✅ [${token}] ${dateStr}: $${price}`);
-        } else {
-          console.warn(`⚠️ [${token}] ${dateStr}: No price returned`);
-        }
+        if (price && typeof price === 'number') {
+  await TokenPrice.create({ token, network, date: dateStr, timestamp: unix, price });
+  const fixed = price.toFixed(3);
+  console.log('📦 Caching worker price:', cacheKey, fixed);
+  await redis.set(cacheKey, fixed);
+} else {
+  console.warn(`⚠️ [${token}] ${dateStr}: Invalid price`, price);
+}
       } catch (err) {
         console.warn(`⚠️ Failed on ${dateStr}:`, err.message);
       }

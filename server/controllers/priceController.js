@@ -1,5 +1,5 @@
 const TokenPrice = require('../models/TokenPrice');
-const redis = require('../redisClient'); // ✅ updated
+const redis = require('../redisClient');
 console.log('🧪 Redis object keys:', Object.keys(redis));
 const { JsonRpcProvider } = require('ethers');
 const getAlchemyRpc = require('../utils/getAlchemyRpc');
@@ -27,9 +27,12 @@ const getPrice = async (req, res) => {
 
     const exact = await TokenPrice.findOne({ token, network, timestamp });
     if (exact) {
-      console.log("🧪 Caching exact price:", cacheKey, exact.price);
-      if (exact.price !== undefined) {
-        await redis.set(cacheKey, exact.price.toFixed(4));
+      if (typeof exact.price === 'number') {
+        const fixed = exact.price.toFixed(4);
+        console.log('📦 Caching DB price:', cacheKey, fixed);
+        await redis.set(cacheKey, fixed);
+      } else {
+        console.warn('⚠️ DB price is not a number:', exact.price);
       }
       return res.json({ price: exact.price, source: "db" });
     }
@@ -49,9 +52,12 @@ const getPrice = async (req, res) => {
     const p1 = after[0].price;
 
     const interpolated = interpolate(timestamp, ts0, p0, ts1, p1);
-    console.log("🧪 Caching interpolated price:", cacheKey, interpolated);
-    if (interpolated !== undefined) {
-      await redis.set(cacheKey, interpolated.toFixed(4));
+    if (typeof interpolated === 'number') {
+      const fixed = interpolated.toFixed(4);
+      console.log('📦 Caching interpolated price:', cacheKey, fixed);
+      await redis.set(cacheKey, fixed);
+    } else {
+      console.warn('⚠️ Interpolated price is not a number:', interpolated);
     }
 
     return res.json({ price: parseFloat(interpolated.toFixed(4)), source: "interpolated" });
