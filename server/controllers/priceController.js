@@ -1,5 +1,6 @@
 const TokenPrice = require('../models/TokenPrice');
 const redis = require('../redisClient'); // ✅ updated
+console.log('🧪 Redis object keys:', Object.keys(redis)); // Add this line
 const { JsonRpcProvider } = require('ethers');
 const getAlchemyRpc = require('../utils/getAlchemyRpc');
 
