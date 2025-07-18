@@ -1,41 +1,51 @@
 # 🧠 Token Price Oracle
 
-A decentralized utility that allows users to query **historical token prices** (based on block timestamps) and **schedule complete price histories** of any ERC20 token on Ethereum or Polygon. Built using a modern full-stack architecture, this tool is essential for DeFi analytics, dApps, or smart contracts that depend on verifiable past prices.
+A decentralized utility to **fetch historical token prices** and **schedule full price histories** for ERC-20 tokens on **Ethereum** and **Polygon**. Useful for **DeFi analytics**, **dApps**, and **smart contracts** that rely on verifiable price data at specific past timestamps.
+
+🌐 **Live Demo**: https://token-oracle-frontend.onrender.com
 
 ---
 
 ## 🚀 Features
 
-- 🔍 **Fetch Historical Price** of any ERC20 token by:
-  - Token address
-  - Blockchain network (Ethereum / Polygon)
-  - Timestamp
-  - Output: Exact or interpolated price (USD)
+- 🔍 **Query Historical Price**
+  - Input: Token address, network (Ethereum / Polygon), and timestamp
+  - Output: Exact or interpolated token price (in USD)
 
-- 📅 **Schedule Full History**:
-  - Automatically fetch and store daily historical prices from token creation to current day
+- 📅 **Schedule Full Price History**
+  - Automatically fetches and stores daily token prices from the token's deployment date to the current date
 
-- ⚡ **Fast Caching** using Redis
-- 🛡️ **Secure API** with environment variables
-- 📦 **Modular architecture** for easy expansion
+- ⚡ **Fast Redis Caching** to avoid redundant API calls
+- 🔐 **Secure Backend** using environment variables
+- 🧩 **Modular Codebase** — easily extendable to other chains or tokens
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Frontend** — [`/client`](./client)
+### 🔷 Frontend — [`/client`](./client)
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Forms**: React Hook Form
-- **API Handling**: Axios
+- **Data Fetching**: Axios
 
-### **Backend** — [`/`](./)
+### 🔶 Backend — [`/`](./)
 - **Runtime**: Node.js
 - **Framework**: Express.js
-- **Caching**: Redis (via Upstash REST)
-- **Utilities**: Ethers.js, dotenv, axios
-- **CORS & Logging**: CORS, Morgan
+- **Blockchain Interaction**: Ethers.js
+- **Caching**: Redis (Upstash REST API)
+- **API Integration**: CoinGecko, Etherscan, Polygonscan
+- **Utilities**: dotenv, morgan, cors
+
+---
+
+## 📦 APIs & Tools Used
+
+- 🧪 **CoinGecko API** — for fetching token price data
+- ⛓️ **Etherscan & Polygonscan APIs** — for determining token deployment timestamp
+- ⚡ **Upstash Redis** — for serverless caching via REST
+- 🔐 **dotenv** — for managing secrets securely
 
 ---
 
@@ -44,9 +54,16 @@ A decentralized utility that allows users to query **historical token prices** (
 - Ethereum Mainnet
 - Polygon Mainnet
 
-*(Easily extendable to other EVM chains)*
+✅ Easily extendable to other EVM-compatible chains
 
 ---
+
+## 🧠 Price Worker Script
+
+To fetch and save full token price history (from creation to today), run the worker manually:
+
+```bash
+node priceWorker.js
 
 ## 📦 APIs & Tools Used
 
