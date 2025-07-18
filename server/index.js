@@ -10,7 +10,17 @@ const apiRoutes = require('./routes/apiRoutes'); // ✅ Combined route
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// ✅ Custom CORS Configuration — Allow specific domains
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://token-oracle-frontend.onrender.com'
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ✅ API Routes
